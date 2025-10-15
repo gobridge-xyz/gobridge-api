@@ -1,6 +1,6 @@
 import { createPublicClient, http, Hex, defineChain, createWalletClient, Account, webSocket } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { ChainKey, CFG } from "../config/index"
+import { ChainKey, CFG } from "../config/index.js"
 
 const rnk = defineChain({
   id: 1597,

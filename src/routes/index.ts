@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
-import { BridgePointsService } from "../services/BridgePointsService";
-import createPointsRouter from "./points";
-import createBridgesRouter from "./bridges";
-import createCalculateRouter from "./calculate";
+import { BridgePointsService } from "../services/BridgePointsService.js";
+import createPointsRouter from "./points.js";
+import createBridgesRouter from "./bridges.js";
+import createCalculateRouter from "./calculate.js";
 
 export default function routesFactory(deps: { prisma: PrismaClient; points: BridgePointsService }) {
   const r = Router();

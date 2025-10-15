@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { BridgePointsService } from "../services/BridgePointsService";
+import { BridgePointsService } from "../services/BridgePointsService.js";
 
 export default function createPointsRouter(points: BridgePointsService) {
   const r = Router();

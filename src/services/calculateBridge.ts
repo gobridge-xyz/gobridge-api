@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { getPublicClient, getAdminWallet, getAdminAccount, getRNKPublicClient } from "../lib/rpc";
-import { ERC20_ABI, goBridgeManagerAbi, QUOTER_V2_ABI } from "../lib/abi";
+import { getPublicClient, getAdminWallet, getAdminAccount, getRNKPublicClient } from "../lib/rpc.js";
+import { ERC20_ABI, goBridgeManagerAbi, QUOTER_V2_ABI } from "../lib/abi.js";
 import { encodePacked, keccak256, toHex, Address, zeroAddress, encodeAbiParameters, stringToBytes, decodeErrorResult, ContractFunctionRevertedError, BaseError, Hex, isHex, parseAbi, parseUnits, formatEther, parseAbiParameters, PublicClient } from "viem";
 import { randomBytes } from "crypto";
-import type { PriceService } from "./priceService";
-import { CFG, ChainKey } from "../config";
+import type { PriceService } from "./priceService.js";
+import { CFG, ChainKey } from "../config/index.js";
 
 const RNK_GAS = 75_000n;
 
