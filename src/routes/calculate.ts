@@ -1,11 +1,10 @@
 import { Router, Request, Response } from "express";
-import { z } from "zod";
-import type { PriceService } from "../services/priceService";
+import type { PriceService } from "../services/priceService.js";
 import {
   CalcReqSchema,
   type CalcReq,
   calculateBridge,
-} from "../services/calculateBridge";
+} from "../services/calculateBridge.js";
 
 /** GET desteği için legacy param adlarını yeni şemaya çevirir */
 function normalizeQueryToCalcReq(q: any): Record<string, unknown> {

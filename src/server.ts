@@ -5,12 +5,12 @@ import rateLimit from "express-rate-limit";
 import "dotenv/config";
 import { z } from "zod";
 
-import routesFactory from "./routes";
-import { PriceService } from "./services/priceService";
+import routesFactory from "./routes/index.js";
+import { PriceService } from "./services/priceService.js";
 
 import { PrismaClient } from "@prisma/client";
-import { BridgePointsService } from "./services/BridgePointsService";
-import { ChainKey } from "./config";
+import { BridgePointsService } from "./services/BridgePointsService.js";
+import { ChainKey } from "./config/index.js";
 
 const app = express();
 
