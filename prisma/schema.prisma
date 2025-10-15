@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserPoints {
+  walletAddress String   @id
+  points        Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bridges       Bridge[]
+}
+
+model Bridge {
+  id            String   @id @default(cuid())
+  walletAddress String
+  requestId     String   @unique
+  fromChain     Int
+  fromHash      String   @unique
+  toChain       Int?
+  toHash        String?
+
+  startTimestamp DateTime
+  endTimestamp   DateTime?
+  durationMs     Int?
+
+  pointsAwarded  Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  user UserPoints @relation(fields: [walletAddress], references: [walletAddress], onDelete: Cascade)
+
+  @@index([walletAddress, fromChain, startTimestamp(sort: Desc)])
+  @@index([walletAddress, toChain, endTimestamp(sort: Desc)])
+}
+
+model Cursor {
+  id         Int      @id @default(autoincrement())
+  chainKey   String
+  eventName  String
+  block      BigInt
+  logIndex   Int
+  updatedAt  DateTime @updatedAt
+
+  @@unique([chainKey, eventName])
+}

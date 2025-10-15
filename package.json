@@ -1,0 +1,32 @@
+{
+  "name": "gobridge-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "start:prod": "pnpm prisma migrate deploy && pnpm start",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.17.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "viem": "2.37.9",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.2",
+    "prisma": "^6.17.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
