@@ -1,9 +1,7 @@
 import type { Address, Hash, Hex, Abi, Log } from "viem";
 import {
   createPublicClient,
-  webSocket,
   http,
-  fallback,
   type PublicClient,
 } from "viem";
 import { PrismaClient } from "@prisma/client";
@@ -13,8 +11,6 @@ import { goBridgeManagerAbi } from "../lib/abi.js";
 import {
   backfill,
   getCursor,
-  saveCursor,
-  findEventSignature,
   type Cursor,
 } from "../lib/backfill.js";
 
@@ -40,26 +36,12 @@ type BridgeFinalizeEvent = {
   endTs: Date;
 };
 
-type StartWatcherParams = {
-  client: PublicClient;                 // pollClient (HTTP-only) önerilir
-  address: Address;
-  abi: Abi;
-  eventName: string;
-  fromBlock: bigint;                    // cursor.block
-  pollingInterval?: number;             // ms
-  strict?: boolean;
-  onLogBatch: (logs: Log[]) => Promise<void>;
-  onRestart?: (err: unknown, attempt: number) => void; // opsiyonel loglama
-  backoffBaseMs?: number;               // 1000 gibi
-  backoffMaxMs?: number;                // 15000 gibi
-};
-
 export class BridgePointsService {
   private prisma: PrismaClient;
   private chainKeys: ChainKey[];
   private award: AwardRule;
   private unwatchers: Array<() => void> = [];
-  private intervals: NodeJS.Timeout[] = [];        // ★ periyodik backfill için
+  private intervals: NodeJS.Timeout[] = [];
   private tailRunning = new Map<string, boolean>();
 
   private pendingFinalized = new Map<
@@ -67,7 +49,7 @@ export class BridgePointsService {
     { toChain: number; toHash: string; endTs: Date }
   >();
 
-  private static readonly CONFIRMATIONS = 2;       // ★ reorg güvenliği
+  private static readonly CONFIRMATIONS = 2;
 
   constructor(opts: { prisma: PrismaClient; chainKeys: ChainKey[]; award?: AwardRule }) {
     this.prisma = opts.prisma;
@@ -82,21 +64,15 @@ export class BridgePointsService {
     };
   }
 
-  /** Başlat: tüm zincirlerde init/finalize event’lerini dinler */
   async start() {
     for (const chainKey of this.chainKeys) {
       const chainCfg = CFG.chains[chainKey];
-
-      // ★ WS + HTTP fallback
-
       const client = createPublicClient({ chain: chainCfg.chain, transport: http() }) as any;
 
-      // ★ Cursor’ları yükle (yoksa chain deploy block’u ya da 0n verebilirsin)
       const defaultFromBlock = BigInt(chainCfg.deploymentBlock ?? 0);
       const initCursor = await getCursor(this.prisma, chainKey, "BridgeInitialized", defaultFromBlock);
       const finCursor  = await getCursor(this.prisma, chainKey, "BridgeFinalized", defaultFromBlock);
 
-      // ★ Periyodik backfill (30 sn’de bir, latest-Confirmations’a kadar)
       const doBackfill = async () => {
         try {
           await backfill(
@@ -142,7 +118,6 @@ export class BridgePointsService {
     }
   }
 
-  /** Tüm watcher ve interval’ları kapatır */
   async stop() {
     this.stopTailers();
     for (const t of this.intervals) {
@@ -150,8 +125,6 @@ export class BridgePointsService {
     }
     this.intervals = [];
   }
-
-  /** --- WS & Backfill ortak log handler’ları --- */
 
   private async handleInitLog(client: PublicClient, log: Log, chainKey: ChainKey) {
     try {
@@ -360,7 +333,6 @@ export class BridgePointsService {
     });
   }
 
-  /** UI için tek obje + bridges[] */
   async getUserView(address: string, limit = 100) {
     const a = address.toLowerCase();
 

@@ -57,10 +57,6 @@ const backfillRunning = new Map<string, boolean>();
 const DEFAULT_MAX_RANGE = 15_000n;
 const BACKOFF_MS = 400;
 
-/**
- * Backfill: latest-confirmations'tan daha eski bloklara kadar tarar,
- * log'ları sırayla işler ve cursor'u ileri taşır.
- */
 export async function backfill<TLog extends Log<any, any, any>>(
   {
     client,

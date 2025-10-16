@@ -11,9 +11,7 @@ export default function createBridgesRouter(prisma: PrismaClient) {
         addr: z.string().min(1),
         fromChain: z.coerce.number().int().optional(),
         toChain: z.coerce.number().int().optional(),
-        // start|end: hangi zamana göre sıralansın
         sort: z.enum(["start", "end"]).default("start"),
-        // opsiyonel cursor (id) ile sayfalama
         cursor: z.string().optional(),
         limit: z.coerce.number().int().min(1).max(200).default(50),
       });

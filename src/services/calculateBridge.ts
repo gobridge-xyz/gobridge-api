@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { getPublicClient, getAdminWallet, getAdminAccount, getRNKPublicClient } from "../lib/rpc.js";
-import { ERC20_ABI, goBridgeManagerAbi, QUOTER_V2_ABI } from "../lib/abi.js";
-import { encodePacked, keccak256, toHex, Address, zeroAddress, encodeAbiParameters, stringToBytes, decodeErrorResult, ContractFunctionRevertedError, BaseError, Hex, isHex, parseAbi, parseUnits, formatEther, parseAbiParameters, PublicClient } from "viem";
+import { getPublicClient, getAdminAccount, getRNKPublicClient } from "../lib/rpc.js";
+import { goBridgeManagerAbi, QUOTER_V2_ABI } from "../lib/abi.js";
+import { keccak256, toHex, Address, zeroAddress, encodeAbiParameters, stringToBytes, decodeErrorResult, ContractFunctionRevertedError, BaseError, Hex, isHex, parseAbi, parseUnits } from "viem";
 import { randomBytes } from "crypto";
 import type { PriceService } from "./priceService.js";
 import { CFG, ChainKey } from "../config/index.js";
@@ -521,17 +521,17 @@ export async function calculateBridge(req: CalcReq, priceService: PriceService):
           : "dst finalizeBridge estimate failed");
   }
 
-  dstFeeWei = (dstFeeWei * 15_000n) / 10_000n; // +%50 güvenlik marjı
+  dstFeeWei = (dstFeeWei * 15_000n) / 10_000n;
 
   const price = await getRNKPublicClient().getGasPrice()
   const rnkWei = price ? price * RNK_GAS : 100001000000n * RNK_GAS;
 
-  if (!priceService.get("reactive-network")?.usd || !priceService.get("ethereum")?.usd) {
+  if (!priceService.get("REACT")?.usd || !priceService.get("ETH")?.usd) {
     throw new Error("RNK or ETH price not available");
   }
 
-  const rnkUsd18 = priceToFp(priceService.get("reactive-network")!.usd, 18);
-  const ethUsd18 = priceToFp(priceService.get("ethereum")!.usd, 18);
+  const rnkUsd18 = priceToFp(priceService.get("REACT")!.usd, 18);
+  const ethUsd18 = priceToFp(priceService.get("ETH")!.usd, 18);
 
   const rnkFeeUsd18 = mulDivFloor(rnkWei, rnkUsd18, 10n ** 18n); // RNK gas fee (USD18)
   const dstFeeUsd18 = mulDivFloor(dstFeeWei, ethUsd18, 10n ** 18n);

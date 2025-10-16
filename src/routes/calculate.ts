@@ -6,7 +6,6 @@ import {
   calculateBridge,
 } from "../services/calculateBridge.js";
 
-/** GET desteği için legacy param adlarını yeni şemaya çevirir */
 function normalizeQueryToCalcReq(q: any): Record<string, unknown> {
   const srcChainId  = q.srcChainId  ?? q.fromChain  ?? q.fromChainId  ?? q.srcChain;
   const destChainId = q.destChainId ?? q.toChain    ?? q.toChainId    ?? q.destChain;
@@ -33,13 +32,10 @@ function normalizeQueryToCalcReq(q: any): Record<string, unknown> {
 export default function createCalculateRouter() {
   const r = Router();
 
-  /** Ortak handler: hem POST hem GET buraya düşer */
   const handle = async (payload: unknown, req: Request, res: Response) => {
-    // GET’ten geldiyse normalize et
     const data =
       req.method === "GET" ? normalizeQueryToCalcReq(payload) : (payload as any);
 
-    // Senin Zod şeman
     const parsed = CalcReqSchema.safeParse(data);
     if (!parsed.success) {
       console.warn("Invalid /calculateBridge request:", parsed.error.flatten());
@@ -49,8 +45,7 @@ export default function createCalculateRouter() {
     try {
       const priceService: PriceService | undefined = req.app.locals.priceService;
       const out = await calculateBridge(parsed.data as CalcReq, priceService!);
-      // isteğe bağlı log:
-      // console.log("Calculated /calculateBridge for ip:", req.ip);
+
       res.json(out);
     } catch (err: any) {
       console.error("[/calculateBridge] error:", err);
@@ -58,10 +53,7 @@ export default function createCalculateRouter() {
     }
   };
 
-  // Yeni: POST /api/calculateBridge (JSON body)
   r.post("/", async (req, res) => handle(req.body, req, res));
-
-  // Eski ile uyumluluk: GET /api/calculateBridge?... (query)
   r.get("/", async (req, res) => handle(req.query, req, res));
 
   return r;
