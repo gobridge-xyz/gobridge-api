@@ -14,7 +14,6 @@ type Opts = {
 
 export class PriceService {
   private symbols: string[];
-  private vs: string;
   private intervalMs: number;
   private timer?: NodeJS.Timeout;
   private prices: PriceMap = {};
@@ -39,8 +38,8 @@ export class PriceService {
     if (this.timer) clearInterval(this.timer);
   }
 
-  get(id: string): PriceEntry | undefined {
-    return this.prices[id.toLowerCase()];
+  get(symbol: string): PriceEntry | undefined {
+    return this.prices[symbol.toUpperCase()];
   }
 
   getAll(): PriceMap {
