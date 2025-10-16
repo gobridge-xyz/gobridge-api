@@ -45,8 +45,8 @@ app.set("trust proxy", 1);
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 // Services
-const priceService = new PriceService({ ids: ["ethereum", "reactive-network"], intervalMs: 45_000 });
-priceService.start();
+const priceService = new PriceService({ symbols: ["ETH", "REACT"], intervalMs: 45_000 });
+await priceService.start();
 app.locals.priceService = priceService;
 
 // DB & Points
